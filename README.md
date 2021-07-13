@@ -1,8 +1,11 @@
-# Today I Learned(TIL) Wiki
+# Today I Learned(TIL)
 
 ## Algorithm
 * 자료구조
   * [Priority Queue](https://github.com/csgm2328/TIL/blob/master/Algorithm/%EC%9E%90%EB%A3%8C%EA%B5%AC%EC%A1%B0/Priority%20Queue.md)
+* Graph
+  * [BFS & DFS](https://github.com/csgm2328/TIL/tree/master/Algorithm/Graph/BFS%20%26%20DFS)
+  * [Tree](https://github.com/csgm2328/TIL/tree/master/Algorithm/Graph/Tree) 
 
 ## Git
 * GitHub Pages로 DevOps 환경구성
