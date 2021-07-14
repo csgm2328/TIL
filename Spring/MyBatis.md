@@ -3,7 +3,7 @@
 * 절차
   * Sub PJT 1 - Skeleton 회원가입
   * front 에서 회원가입 버튼 누르면
-  * checkValue() 에서 [passwordValidator()]()로 정규표현식 검증한 후
+  * checkValue() 에서 [passwordValidator()](https://github.com/csgm2328/TIL/blob/master/Vue/%ED%99%9C%EC%9A%A9.md)로 정규표현식 검증한 후
   * 왜냐하면 Handler에 매핑 되는 파라미터가 정규표현식을 만족해야하는 SignupRequest 타입이다
   * 그러고 중복검사 후 등록
 * MyBatis
