@@ -19,3 +19,8 @@
       * UPDATE, DELETE도 모아서 가능
     * 캐시
       * 똑같은 쿼리 요청하면 캐시에 저장했다가 반환
+* 활용
+  * ⚠️주의: insert시 DB schema에서 NOT NULL인 column들은 전부 객체에 set()
+  * save() 로 insert시 같은 내용이 이미 있다면 Dirty Checking으로 update가 되어버리므로 주의
+    * PK로 검색하는 findById()를 통해 위 상황 막을 수 있음
+    * 이걸 이용해서 메서드 하나에 삽입과 수정 기능을 만들 수도 있음
