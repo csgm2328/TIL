@@ -20,7 +20,18 @@
     * 캐시
       * 똑같은 쿼리 요청하면 캐시에 저장했다가 반환
 * 활용
-  * ⚠️주의: insert시 DB schema에서 NOT NULL인 column들은 전부 객체에 set()
-  * save() 로 insert시 같은 내용이 이미 있다면 Dirty Checking으로 update가 되어버리므로 주의
-    * PK로 검색하는 findById()를 통해 위 상황 막을 수 있음
-    * 이걸 이용해서 메서드 하나에 삽입과 수정 기능을 만들 수도 있음
+  * **Insert**
+    * ⚠️주의: insert시 DB schema에서 NOT NULL인 column들은 전부 객체에 set()
+    * ⚠️주의: save() 로 insert시 같은 내용이 이미 있다면 Dirty Checking으로 update가 되어버림
+      * PK로 검색해서 findById()로 객체가 반환되는지 체크하자!
+      * 이걸 이용해서 메서드 하나에 삽입과 수정 기능을 만들 수도 있음
+  * **자동 스키마 생성**
+    * jpa 설정하고 schema를 정의한 .java 파일만 만들어도 연결된 db에 해당 테이블이 없다면 자동으로 hibernate가 schema를 만들어준다
+    * 하지만, 관계설정은 수정해야함
+  * __Update__
+    * JpaRepository에 따로 update() 함수는 없다
+    * @Query()로 작성은 가능하지만 권장❌
+    * hibernate가 select할 때마다 db와 **자동으로 sync**를 맞춰주는 기능을 활용해 java내에서 변수를 변경하고
+    * findAll() 함수를 실행하면 select하기전 변경사항이 수정된다
+    * 이 때 영속성 이전을 위한 **@Transactional** 필요
+  
