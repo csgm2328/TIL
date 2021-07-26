@@ -35,11 +35,19 @@
 * __프로필 이미지 기능__
   * git conflict
     * UserService 수정부분이 충돌남 왜???
+    * 아마 develop에 merge 후 다시 내 브랜치에서 develop 내용들을 merge하지 않아서 발생된 듯함
+    * 해결: 웹에서 원격 merge 후에 local 에서 develop* pull 이후에 local로 머지
+      ```git
+      $ git 
+      $ git merge --no-ff "feature/~"
+      ```
     * 원격 머지 & 로컬 머지를 추천해줘서 둘다해서 잘 마무리되었지만
     * 왜 충돌났는지는 모르겠다
   * imgdata 대신 imgpath
     * 팀원 요청으로 DB에 말고 로컬에 저장후 url을 db에 저장
     * lombok 기능인 Builder로 setter 대신 사용
+  * ImageHandler()
+    * 
   * __팔로우 기능__
     * 팔로우 버튼 누르면 save(AI-code, from(A), to(B)
     * 팔로우 상태에서 또 누르면 언팔로우
@@ -77,5 +85,8 @@
 
 
 
-
+## TID - 6
+* __알림 기능__
+  * 새로운 팔로우나 좋아요, 스크랩 발생시 해당 소유자에게 알림 발송
+  * WebSocket을 통해 서버에서 발생한 요청을 실시간으로 프론트에서 표시해야함
 

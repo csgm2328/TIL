@@ -16,7 +16,7 @@
 ## 📱Frontend
 * [Vue.js](Vue/활용.md)
   
-## TID(Today I Developed)
+## 👨‍💻TID(Today I Developed)
 * [큐레이팅 SNS](TID/큐레이팅%20SNS.md)
   
 ## :octocat:Git

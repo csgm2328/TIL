@@ -26,7 +26,7 @@
       * PK로 검색해서 findById()로 객체가 반환되는지 체크하자!
       * 이걸 이용해서 메서드 하나에 삽입과 수정 기능을 만들 수도 있음
   * **자동 스키마 생성**
-    * jpa 설정하고 schema를 정의한 .java 파일만 만들어도 연결된 db에 해당 테이블이 없다면 자동으로 hibernate가 schema를 만들어준다
+    * jpa 설정하고 schema를 정의한 클래스 파일만 만들고 실행해도 연결된 db에 해당 테이블이 없다면 자동으로 hibernate가 schema를 만들어준다
     * 하지만, 관계설정은 수정해야함
   * __Update__
     * JpaRepository에 따로 update() 함수는 없다
