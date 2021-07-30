@@ -107,5 +107,13 @@
         //이때 "*"로 모든 경로 열어줄것이므로 setAllowedOrigins() 대신
         addEndpoint("/ws").setAllowedOriginPatterns("*")
         ```
-    * Controller에서 MessageMapping
+  * 구현
+    * 연결할 서버 url로 connect 요청
+    * 첫 성공시
+      * subscribe() 구독할 라우팅 설정
+      * ex) send(addUser())같은 함수도 동작시켜서 서버에 누가 입장했는지 알릴 수 있음
+    * 그 후 send(sendMessage())로 구독중인 유저들에게 broadcast
+    * Controller
+      * addUser나sendMessage같은 함수 처리하기 위해 MessageMapping() 처리
+    * WebSocketEventListner를 통해 서버내에 연결 수립과 끊김 이벤트시 동작 만들 수 있음
 
