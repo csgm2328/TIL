@@ -116,4 +116,13 @@
     * Controller
       * addUser나sendMessage같은 함수 처리하기 위해 MessageMapping() 처리
     * WebSocketEventListner를 통해 서버내에 연결 수립과 끊김 이벤트시 동작 만들 수 있음
+  * 배포
+    * server 환경 설정
+    * mariaDB > source ./sql
+      * index 오류 있어서 지워줌
+    * spring boot:run 5분이상 소요
+    * mvn package는 금방 되곤
+    * 오류 발생하면 package 빌드 다시
+    * jar 실행으로 boot 실행
+    * 
 
