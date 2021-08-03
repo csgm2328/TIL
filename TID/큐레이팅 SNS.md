@@ -116,6 +116,10 @@
     * Controller
       * addUser나sendMessage같은 함수 처리하기 위해 MessageMapping() 처리
     * WebSocketEventListner를 통해 서버내에 연결 수립과 끊김 이벤트시 동작 만들 수 있음
+
+  * 새로운 스프린트 프로젝트 시작
+    * git remote set-url ""
+
   * 배포
     * server 환경 설정
     * mariaDB > source ./sql
@@ -124,5 +128,24 @@
     * mvn package는 금방 되곤
     * 오류 발생하면 package 빌드 다시
     * jar 실행으로 boot 실행
-    * 
-
+    * __Nginx 설정__
+      * sites 설정에서
+      * root에 프론트 dist 경로넣고
+      * server location / 는 프론트 경로
+      * location /api는 백엔드 경로로 지정
+    * VS Code SSH 설정
+      * ~/.ssh/ 아래로 .pem 옮기고
+      * 포트번호 aws는 포트번호 쓰면 안됨
+    * 배포서버에 이미지 경로 수정
+      * window 환경 --> linux
+      
+    * ⚠️ EC2 에서 Google EmailSender 보안 문제
+      * https://myaccount.google.com/lesssecureapps?pli=1&rapt=AEjHL4MeKKMmmil0-s9aZNPDKI_KYzblyQkN-i5OF7jqLiemjfoYucG6srbUHJeDBT7Rz2Redt-a1G9nFBw-loTlJozpCkaFBw
+      * 기본적으로 허용 후에도 EC2로 접근시 막힐 때
+      * https://accounts.google.com/b/0/DisplayUnlockCaptcha
+      * 이것도 허용
+      
+  * ⚠️ MySQL WorkBench 오류
+    * user table의 email을 모두가 FK로 쓰는데 여러 테이블이 참조가 불가능한 상황 발생
+    * mariadb server에서는 index를 지우고 하니까 되고
+    * workbench에서는 아예 테이블을 새로만들어서 하니까 됨
