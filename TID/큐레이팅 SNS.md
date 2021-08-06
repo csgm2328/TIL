@@ -117,17 +117,17 @@
       * addUser나sendMessage같은 함수 처리하기 위해 MessageMapping() 처리
     * WebSocketEventListner를 통해 서버내에 연결 수립과 끊김 이벤트시 동작 만들 수 있음
 
+  ## TID - 7
   * 새로운 스프린트 프로젝트 시작
     * git remote set-url ""
 
-  * 배포
+  * __배포__
     * server 환경 설정
     * mariaDB > source ./sql
       * index 오류 있어서 지워줌
-    * spring boot:run 5분이상 소요
-    * mvn package는 금방 되곤
-    * 오류 발생하면 package 빌드 다시
-    * jar 실행으로 boot 실행
+    * 첫 spring boot:run 5분이상 소요
+    * mvn package로 빌드 후(변경 시 필요)
+    * jar servlet.context=/api 경로 지정 실행으로 boot 실행
     * __Nginx 설정__
       * sites 설정에서
       * root에 프론트 dist 경로넣고
@@ -138,7 +138,31 @@
       * 포트번호 aws는 포트번호 쓰면 안됨
     * 배포서버에 이미지 경로 수정
       * window 환경 --> linux
-      
+
+    * __보안설정__
+      * .pem키를 gitlab에서 누구나 다운받을 수 있음
+      * 그러므로 누구든 접속 가능.
+      * 접속을 하면 일단 서버 코드를 볼 수 있어서
+      * applcation.* 보기 권한 설정하기
+        * 🛠️해결 
+        * sudo 비번 설정
+        * application.* 파일들 소유,파일 권한 root로 변경
+          * 권한 변경만 했을 때는 
+        * 이젠 빌드를 **sudo 권한**으로해야한다
+          * 근데 sudo로 빌드하면 왜 다시 처음부터 다운받지???
+      * sudo mysql 막기
+        * 🛠️해결 
+        * /usr/bin/mysql_secure_installation 실행
+        * root 계정 password 설정
+        * root로의 원격접속 막기 설정
+          * 이렇게 하면 root@%(모든 원격 허용했던) 계정이 사라짐
+          * 그러므로 root@serverIP 추가해줘야함
+      * IP 차단을 위해서는 ufw를 사용해야하는데 ssh까지 차단될 위험이 있어서 보류
+      * time_zone 설정 (datasource셋팅해도 안바뀜)
+        ```sql
+        SET GLOBAL time_zone='Asia/Seoul';
+        set time_zone='Asia/Seoul';
+        ``` 
     * ⚠️ EC2 에서 Google EmailSender 보안 문제
       * https://myaccount.google.com/lesssecureapps?pli=1&rapt=AEjHL4MeKKMmmil0-s9aZNPDKI_KYzblyQkN-i5OF7jqLiemjfoYucG6srbUHJeDBT7Rz2Redt-a1G9nFBw-loTlJozpCkaFBw
       * 기본적으로 허용 후에도 EC2로 접근시 막힐 때
@@ -149,3 +173,4 @@
     * user table의 email을 모두가 FK로 쓰는데 여러 테이블이 참조가 불가능한 상황 발생
     * mariadb server에서는 index를 지우고 하니까 되고
     * workbench에서는 아예 테이블을 새로만들어서 하니까 됨
+
