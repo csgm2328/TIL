@@ -108,10 +108,16 @@
         addEndpoint("/ws").setAllowedOriginPatterns("*")
         ```
   * 구현
-    * 연결할 서버 url로 connect 요청
-    * 첫 성공시
+    * 연결할 서버 url로 webSocket 연결
+    * 성공시
       * subscribe() 구독할 라우팅 설정
-      * ex) send(addUser())같은 함수도 동작시켜서 서버에 누가 입장했는지 알릴 수 있음
+        * ex) send(addUser())같은 함수도 동작시켜서 서버에 누가 입장했는지 알릴 수 있음
+      * /queue/{email}으로 구독할 때 자신에게 라우팅된 알림만 받기
+      * 그러고 서비스 함수들에 알림함수를 추가해 서비스 동작 후 알림이 발생하도록 연결
+        * ex) profileController.follow() 에 alarmService.follow()추가해서 알림을 따로 Controller로 라우팅하지 않고 서비스만 만들어서 메세지를 만들어낸다
+        * 만들어진 메세지는 DB에 추가하고
+        * 확인안한 메세지의 개수를 리턴하는 함수도 만든다
+  
     * 그 후 send(sendMessage())로 구독중인 유저들에게 broadcast
     * Controller
       * addUser나sendMessage같은 함수 처리하기 위해 MessageMapping() 처리
