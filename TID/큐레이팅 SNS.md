@@ -137,23 +137,13 @@
         //알림이 필요한 기능 동작 후에 알림메시지를 연계 동작으로 생성해주는 방식으로
         void + messageTemplate.ConvertandSend("/queue/" + email)
         ```
-      * __핵심: 서비스 함수들에 알림함수를 추가해 서비스 동작 후 알림이 발생하도록 연결__
-        * profileController.follow() 가 아니고,   
-        * alarmService.follow() 도 아니고
-        * alarmService.createAlarm(함수하나로 alarmtype으로 구분해서 모든 알림 처리)
-        * 알림을 따로 Controller로 라우팅하지 않고 타입별로 메세지를 만들어낸다
-
-      * 만들어진 메세지는 DB에 추가하고
-        * 로그인했을때는 send() + DB추가
-        * 비로그인 시에는 DB추가만
-      * 확인안한 메세지의 개수를 리턴하는 함수도 만든다
+    * __핵심: 서비스 함수들에 알림함수를 추가해 서비스 동작 후 알림이 발생하도록 연결__
+      * profileController.follow() 가 아니고,   
+      * alarmService.follow() 도 아니고
+      * alarmService.createAlarm(함수하나로 alarmtype으로 구분해서 모든 알림 처리)
+      * 알림을 따로 Controller로 라우팅하지 않고 타입별로 메세지를 만들어낸다
+      * 만들어진 메세지는 DB에 추가하고 구독중인 곳에 send()로 구독중인 유저들에게 broadcast
   
-    * 그 후 send(sendMessage())로 구독중인 유저들에게 broadcast
-    * 
-    * __FrontEnd__
-      * 웹소켓 연결이 해당페이지를 벗어나면 끊기므로
-      * 해당 유저가 어떤 페이지에있던 공통적으로 사용하는 Header에다가 웹소켓을 연결한다
-      * bell icon에 Vuetify badges 적용하면 알림 개수 보임
     * __상세 기능__
       * 각 serviceImpl에서 서비스 처리후 **AlarmService.createAlarm() 호출**
         * createAlarm으로 웹소켓 메시지 리턴할 것은 상세 알림 정보가 아니라 알림 bell에 표시할 새로운 알림의 개수다.
@@ -165,12 +155,17 @@
         * 읽은거는 한달 내 생성된것만
       * 알림 읽음 처리 후 countAlarm() 호출
 
+    * __FrontEnd__
+      * 웹소켓 연결이 해당페이지를 벗어나면 끊기므로
+      * 해당 유저가 어떤 페이지에있던 공통적으로 사용하는 Header에다가 웹소켓을 연결한다
+      * bell icon에 Vuetify badges 적용하면 알림 개수 보임
   ## TID - 7
   * 새로운 스프린트 프로젝트 시작
-    * git remote set-url ""
-
+    ```git
+      $ git remote set-url "새로운 프로젝트"
+    ```
   * __배포__
-    * server 환경 설정
+    * AWS server 환경 설정
     * mariaDB > source ./sql
       * index 오류 있어서 지워줌
     * 첫 spring boot:run 5분이상 소요
