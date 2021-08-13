@@ -13,6 +13,8 @@
   * 하지만 null 조건 등 손봐야함
   * 수정
     * 그래서 Update를 따로 쿼리를 만들지 않고 값을 바꾼다음에 findAll() * 을 통해 hibernate가 select 쿼리 전에 Sync를 맞춰서 update를 * 해준다
+    * findby()는 안됨
+    * save()로 자동수정도 가능
   * 삭제
     * deleteBy속성이름
     * 적용되는 쿼리는 id= ? 이지만 잘 적용됨
@@ -74,14 +76,16 @@
       * 	String fromemail;
       * 한쪽에서만 쓰고 명시
       * DB 반영안될때  있어서 autocommit 설정
+    * JPA로 entity관리할때 생성자 no, all 필수
 
 ## TID - 5
 * __팔로우 기능__
   * 유저 검증하기 위해 profileController에서 userService.findbyId() 사용
 * __프로필 페이지 기능__
-  * 이메일(PK), 팔로잉, 팔로우 수, 피드 수, 프로필이미지 url, 계정 * 설정에서 한 코멘트
+  * 이메일(PK), 팔로잉, 팔로우 수, 피드 수, 프로필이미지 path, 
+  * 계정 수정
 * __팔로워, 팔로잉 목록 기능__
-  * findALL()로 객체 가져온다음 프론트에서 쓰기 쉽게 문자열 리스트로 변환해서 전달
+  * findALL()로 객체 가져온다음 프론트에서 쓰기 쉽게 String 리스트로 변환해서 전달
 
 
 
@@ -102,26 +106,64 @@
       * 연결: 엔드포인트(url)를 설정해서 프론트단에서 연결 수립 함수
       * 라우팅: 클라이언트에서 클라이언트로 메시지 라우팅하기 위한 메시지 브로커 구성
     * 이렇게 구성을 하면 위의 라우팅으로 연결된 유저들은 해당 라우터를 **구독**중인 상태가 되고 서버는 그 구독하고 있는 대상들에게 메세지를 broadcast할 수 있음 
+      * 백엔드에서 소켓 서버를 만들고 프론트에서 소켓 서버에 연결요청을 보낸 후 구독을 하는 방식
     * ⚠️주의: backend랑 fronted랑 PORT 다르므로 연결할때 CORS 셋팅 해줘야함
        ```js
         //이때 "*"로 모든 경로 열어줄것이므로 setAllowedOrigins() 대신
         addEndpoint("/ws").setAllowedOriginPatterns("*")
         ```
+    * Controller
+      * MessageMapping() 웹소켓 연결된 프론트에서 오는 메시지 요청에 대한 처리 결과를 웹소켓 연결로 리턴함
+    * WebSocketEventListner
+      * 통해 서버내에 연결 수립과 끊김 이벤트시 logger 설정가능
   * 구현
+    * 참고 사이트
+      * Backend
+        * https://ratseno.tistory.com/71
+        * https://blog.naver.com/PostView.nhn?blogId=gmlwo308&logNo=222210869950&parentCategoryNo=&categoryNo=35&viewDate=&isShowPopularPosts=true&from=search
+      * Frontend
+        * https://ratseno.tistory.com/72?category=773803
     * 연결할 서버 url로 webSocket 연결
+      * 해당 페이지를 열고 있을 때 소켓연결을 유지하는 거라 연결 타이밍을 결정하는게 아니다
+      * 모든 페이지에 항상 있는 헤더에다가 연결코드를 넣어야함
     * 성공시
       * subscribe() 구독할 라우팅 설정
         * ex) send(addUser())같은 함수도 동작시켜서 서버에 누가 입장했는지 알릴 수 있음
-      * /queue/{email}으로 구독할 때 자신에게 라우팅된 알림만 받기
-      * 그러고 서비스 함수들에 알림함수를 추가해 서비스 동작 후 알림이 발생하도록 연결
-        * ex) profileController.follow() 에 alarmService.follow()추가해서 알림을 따로 Controller로 라우팅하지 않고 서비스만 만들어서 메세지를 만들어낸다
-        * 만들어진 메세지는 DB에 추가하고
-        * 확인안한 메세지의 개수를 리턴하는 함수도 만든다
+      * /queue/{로그인한 email}으로 구독할 때 자신에게 라우팅된 알림만 받기
+        ```java
+        Controller를 사용해서 @MessageMapping과
+        @sendToUser() + return Message 방식 대신에
+
+        //알림이 필요한 기능 동작 후에 알림메시지를 연계 동작으로 생성해주는 방식으로
+        void + messageTemplate.ConvertandSend("/queue/" + email)
+        ```
+      * __핵심: 서비스 함수들에 알림함수를 추가해 서비스 동작 후 알림이 발생하도록 연결__
+        * profileController.follow() 가 아니고,   
+        * alarmService.follow() 도 아니고
+        * alarmService.createAlarm(함수하나로 alarmtype으로 구분해서 모든 알림 처리)
+        * 알림을 따로 Controller로 라우팅하지 않고 타입별로 메세지를 만들어낸다
+
+      * 만들어진 메세지는 DB에 추가하고
+        * 로그인했을때는 send() + DB추가
+        * 비로그인 시에는 DB추가만
+      * 확인안한 메세지의 개수를 리턴하는 함수도 만든다
   
     * 그 후 send(sendMessage())로 구독중인 유저들에게 broadcast
-    * Controller
-      * addUser나sendMessage같은 함수 처리하기 위해 MessageMapping() 처리
-    * WebSocketEventListner를 통해 서버내에 연결 수립과 끊김 이벤트시 동작 만들 수 있음
+    * 
+    * __FrontEnd__
+      * 웹소켓 연결이 해당페이지를 벗어나면 끊기므로
+      * 해당 유저가 어떤 페이지에있던 공통적으로 사용하는 Header에다가 웹소켓을 연결한다
+      * bell icon에 Vuetify badges 적용하면 알림 개수 보임
+    * __상세 기능__
+      * 각 serviceImpl에서 서비스 처리후 **AlarmService.createAlarm() 호출**
+        * createAlarm으로 웹소켓 메시지 리턴할 것은 상세 알림 정보가 아니라 알림 bell에 표시할 새로운 알림의 개수다.
+        * countAlarm() 호출
+      * alarmType, From, to이 같은 알림은 하나만 생성
+      * from == to 알림은 생성안함
+      * 해당 유저에 대한 알림 목록**요청**은 **AlarmController**로 처리
+        * 안읽은 게 먼저오도록
+        * 읽은거는 한달 내 생성된것만
+      * 알림 읽음 처리 후 countAlarm() 호출
 
   ## TID - 7
   * 새로운 스프린트 프로젝트 시작
@@ -135,10 +177,28 @@
     * mvn package로 빌드 후(변경 시 필요)
     * jar servlet.context=/api 경로 지정 실행으로 boot 실행
     * __Nginx 설정__
+      * Nginx란?
+        * 비동기방식이라 매우 높은 성능
+        * load balancer나 API gateway로 사용가능
+        * 프론트엔드(정적파일) 서비스할때 뛰어난 성능
+        * 크롬, firefox도 이걸로만듬
+        * nginx로 들어오는 건 http 아니면 https
       * sites 설정에서
       * root에 프론트 dist 경로넣고
-      * server location / 는 프론트 경로
-      * location /api는 백엔드 경로로 지정
+      * server location / 는 프론트 경로(web server 역할)
+      * location /api는 백엔드 경로로 지정(API gateway 역할)
+      * 그러면 이제 nginx가 웹서버역할을 하면서 빌드 파일 위치만 알려주면 node를 실행할 필요가 없어진다
+      * 
+    * 도커?
+      * 왜 도커를 써야하는지
+        * vm, autoscaling은 폭발적인 트래픽을 해결하지못한다.
+        * 이미지를 만들어 놓기만 한다면 운영체제를 부팅하지 않는 도커는 빠르게 필요한 서버를 증설할 수 있다.
+        * 만들어 놓은 이미지대로 배포하는 편의성
+        * 그러므로 프론트/ 백은 도커화해야함
+        * DB, Jenkins, nginx의 도커화는 선택
+          * DB를 배포하는 경우는 거의 없고
+          * 빌드서버가 많을 필요는 없으니
+
     * VS Code SSH 설정
       * ~/.ssh/ 아래로 .pem 옮기고
       * 포트번호 aws는 포트번호 쓰면 안됨
@@ -169,6 +229,22 @@
         SET GLOBAL time_zone='Asia/Seoul';
         set time_zone='Asia/Seoul';
         ``` 
+    * SSL
+      * 로그인같은 경우 회원정보를 암호화해서 보내야함
+      * 매번 이렇게 암호화하기 번거로우니 TLS(Transport Layer Securityfh를 사용해서 암호화)
+    * Cert Bot
+      * 상용 프로그램 제작할 때 구매해서 사용하는 Root 인증서
+      * 무료 인증서도 있으니 FE & BE에 설정
+    * ubuntu , root 말고 사용자 계정 따로 만들어야 해킹 타겟을 피할 수 있음
+    * WebSocket HandShake error(Connection Header error)
+      * <img src="..\assets\websocket handshake error.JPG">
+      * 🛠️ 해결
+        * nginx config: /etc/nginx/sites-enabled/default
+        * 에서 header를 업그레이드 해줌
+        ```sh
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        ```
     * ⚠️ EC2 에서 Google EmailSender 보안 문제
       * https://myaccount.google.com/lesssecureapps?pli=1&rapt=AEjHL4MeKKMmmil0-s9aZNPDKI_KYzblyQkN-i5OF7jqLiemjfoYucG6srbUHJeDBT7Rz2Redt-a1G9nFBw-loTlJozpCkaFBw
       * 기본적으로 허용 후에도 EC2로 접근시 막힐 때
@@ -179,4 +255,15 @@
     * user table의 email을 모두가 FK로 쓰는데 여러 테이블이 참조가 불가능한 상황 발생
     * mariadb server에서는 index를 지우고 하니까 되고
     * workbench에서는 아예 테이블을 새로만들어서 하니까 됨
+
+  * ⚠️ DB 컬럼의 예약어 주의,,
+    * check, like, from
+    * boolean column getter동작안하는 이유는?
+
+  * 날짜 어노테이션 @Auditing
+    * @CreatedDate , @LasetModifiedDate 자동
+    * 모델에 @EntityListeners(AuditingEntityListener.class) 추가
+    * application.java에 @EnableJpaAuditing 추가
+    * 이렇게 많은 라이브러리 사용이 싫다면
+      * @Column(insertable = false, updatable= false)만으로도 가능
 
