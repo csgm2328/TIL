@@ -154,6 +154,7 @@
         * 안읽은 게 먼저오도록
         * 읽은거는 한달 내 생성된것만
       * 알림 읽음 처리 후 countAlarm() 호출
+      * 웰컴 알림을 관리자가 보내주므로 DB 초기화후에 admin은 만들고 알림 켜야함
 
     * __FrontEnd__
       * 웹소켓 연결이 해당페이지를 벗어나면 끊기므로
@@ -221,8 +222,15 @@
       * IP 차단을 위해서는 ufw를 사용해야하는데 ssh까지 차단될 위험이 있어서 보류
       * time_zone 설정 (datasource셋팅해도 안바뀜)
         ```sql
+        # 일시적 세팅
         SET GLOBAL time_zone='Asia/Seoul';
         set time_zone='Asia/Seoul';
+        ```
+        ```sh
+        # 글로벌 세팅 restart 필요
+        vi /etc/mysql/my.cnf
+        [mysqld]
+        default-time-zone='+9:00'
         ``` 
     * SSL
       * 로그인같은 경우 회원정보를 암호화해서 보내야함
