@@ -184,6 +184,21 @@
       * server location / 는 프론트 경로(web server 역할)
       * location /api는 백엔드 경로로 지정(API gateway 역할)
       * 그러면 이제 nginx가 웹서버역할을 하면서 빌드 파일 위치만 알려주면 node를 실행할 필요가 없어진다
+      * __업로드 이미지 크기 설정__
+        ```shell
+        #conf
+        http {
+          client_max_body_size 10M;
+        }
+        #default
+        server {
+          client_max_body_size 10M;
+        }
+        ```
+        ```properties
+        spring.servlet.multipart.maxFileSize=5MB
+        spring.servlet.multipart.maxRequestSize=10MB
+        ```
       * 
     * 도커?
       * 왜 도커를 써야하는지
@@ -230,11 +245,11 @@
         # 글로벌 세팅 restart 필요
         vi /etc/mysql/my.cnf
         [mysqld]
-        default-time-zone='+9:00'
+        default-time-zone='Asia/Seoul'
         ``` 
     * SSL
       * 로그인같은 경우 회원정보를 암호화해서 보내야함
-      * 매번 이렇게 암호화하기 번거로우니 TLS(Transport Layer Securityfh를 사용해서 암호화)
+      * 매번 이렇게 암호화하기 번거로ㅋ우니 TLS(Transport Layer Securityfh를 사용해서 암호화)
     * Cert Bot
       * 상용 프로그램 제작할 때 구매해서 사용하는 Root 인증서
       * 무료 인증서도 있으니 FE & BE에 설정
@@ -269,4 +284,12 @@
     * application.java에 @EnableJpaAuditing 추가
     * 이렇게 많은 라이브러리 사용이 싫다면
       * @Column(insertable = false, updatable= false)만으로도 가능
-
+## TID - 8
+* CI/CD
+  * gitlab Runner 사용하기
+    * Runner 설치 & 등록
+    * Build & Deploy Stage 구성
+      * $CI_PROJECT_DIR : job 실행할 full path 복사
+      * sudo mvn package가 가능해야하는데
+      * chmod +x mvnw --> ./mvnw package로 빌드 성공함
+      * ???
