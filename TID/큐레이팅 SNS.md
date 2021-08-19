@@ -289,7 +289,43 @@
   * gitlab Runner 사용하기
     * Runner 설치 & 등록
     * Build & Deploy Stage 구성
-      * $CI_PROJECT_DIR : job 실행할 full path 복사
-      * sudo mvn package가 가능해야하는데
+      * $CI_PROJECT_DIR : job 실행할 full path 클론
+    * __빌드__
+      * properties 권한 때문에 sudo mvn package로 빌드해야하는데
+      * sudo 권한을 줘도 권한에러가 계속 발생해서
       * chmod +x mvnw --> ./mvnw package로 빌드 성공함
-      * ???
+      * 빌드 성공하면 target/*.jar 를 $HOME/app1.jar로 복사
+        * target/*.jar의 권한은 ubuntu이기 때문에 runner 권한의 jar를 만들어주는 것!
+      * gitignore에 있던 .yml 읽어야 해서 다시 git에 올림
+      * 🛠️ websocket에러로 디펜던시 추가
+      ```properties
+      spring.jpa.database-platform=org.hibernate.dialect.MySQL5Dialect
+      ```
+    * __실행__
+       * gitlab-runner라는 유저로 ci/cd를 실행된다.
+       * ubuntu 권한의 기존 파일들을 읽을 수 없기에 backend 폴더를
+       * 복사해서 jar를 파일처럼 gitlab에도 backend 폴더를 만들어줌
+         * 이래야 jar 실행한 $HOME path를 기준으로 /images 등을 찾아갈 수 있다.
+         * gitlab-runner로 실행시 app.pid를 못만들고 추적이 불가능해서
+            ```sh
+            #restart.sh
+            kill $(ps -ef |grep java | awk '{print $2}')
+            ```
+       * front build 위치 조정
+         ```sh
+         #root /home/ubuntu/SubPJT3/S05P13C102/frontend/dist;
+         root /home/gitlab-runner/dist;
+         ```
+
+    * restart.sh
+      * 상대경로로 app1.jar를 찾아야하므로 /backend에서 실행
+      ```yml
+      deploy-back: 
+          ...
+      script :
+        - cd $HOME/backend
+        - ~/restart_backend1.sh
+      ```
+    * __결과__
+    <img src ="..\assets\gitlab_cicd_passed.JPG">
+
