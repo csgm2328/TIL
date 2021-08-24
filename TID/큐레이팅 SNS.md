@@ -1,12 +1,26 @@
+# [Hobby Zoa](http://i5c102.p.ssafy.io)
+
 ## TID - 1
 * __backend 구조 셋팅(dependency, DB erd)__
 * __회원가입 기능 & Swagger__
 
 ## TID - 2
-* __이메일 인증 구현__
-  * 회원가입 후 토큰생성(token save) 함수 호출 --> 토큰ID와 함께 * 이메일 인증 링크 전송 -->
-  * 만료전(5분) 링크 접속시 인증완료 --> 인증된 이메일로 처리
-  * 회원가입은 일단 되고 메일인증을 받으면 마이페이지에서 인증됨 표시 * 처리 로그인할 때 object넘기므로 그때 getverified()로 구분
+### __이메일 인증 구현__
+* __흐름__
+  * 회원가입 후 토큰생성(token save) 함수 호출 --> 토큰ID와 함께 이메일 인증 링크 전송 --> 만료전(5분) 링크 접속시 인증완료 --> 인증된 이메일로 처리(재인증도 구현)
+* __셋팅__
+  * __.yml__(properties도 가능)로 SMTP 서비스 사용할 계정 설정
+  * DB: __Token ID(PK)__, 만료시간(생성후 5분), 생성시간, 유저 ID(FK), 만료여부
+* __Service__
+  * @Service & @Autowired 필수
+  * 새롭게 Email package만들어서 tokenservice, model, email전송service 만듬
+  * Controller/회원가입에서 user.save() --> createToken()
+  * __createToken()__
+    * token객체만들고 save 후 토큰과 함꼐 이메일 전송
+  * 이제 링크를 누르면 confirmToken()으로
+    * 유저가 만료되지않은 토큰을 가지고 있는지 jpa 함수로 얻어냄
+* __재인증__
+  * 유저이메일(PK)를 받아와서 그 유저의 token을 다 DELETE하고 새로운 토큰 생성 후 confirm
   
 * __JPA는 DB와 sync를 자동으로 맞춰준다__
   * 이메일 인증을 위해 새로운 토큰 model.java를 만들고 서버를 켰을 * 뿐인데 db에 schema가 생겼다????
