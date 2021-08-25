@@ -32,3 +32,7 @@
 
 ## 🌐JIRA
 * [활용법](JIRA/활용법.md)
+
+## Hadoop
+* [하둡이란](Hadoop/BigData.md)
+* [MapReduce](Hadoop\MapReduce.md)
